@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Fun Game & Quiz</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0f172a, #1e1b4b, #311042);
+            color: #ffffff;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Hero Container */
+        .header {
+            text-align: center;
+            padding: 40px 20px 10px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            color: #38bdf8;
+            margin-bottom: 10px;
+            text-shadow: 0 0 15px rgba(56, 189, 248, 0.4);
+        }
+
+        .header p {
+            color: #94a3b8;
+            font-size: 1.1rem;
+        }
+
+        /* Game Section (Dodge Ball) */
+        .game-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .arena {
+            position: relative;
+            width: 90%;
+            max-width: 700px;
+            height: 350px;
+            background: rgba(15, 23, 42, 0.7);
+            border: 2px solid #38bdf8;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 0 25px rgba(56, 189, 248, 0.2);
+            margin-bottom: 40px;
+        }
+
+        .arena-title {
+            position: absolute;
+            top: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #64748b;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            pointer-events: none;
+        }
+
+        .dodge-ball {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            background: radial-gradient(circle, #f43f5e, #be123c);
+            border-radius: 50%;
+            box-shadow: 0 0 20px #f43f5e, 0 0 40px #f43f5e;
+            cursor: pointer;
+            transition: all 0.15s ease-out;
+            top: 150px;
+            left: 300px;
+        }
+
+        /* Quiz Section */
+        .quiz-section {
+            max-width: 650px;
+            margin: 0 auto 60px;
+            padding: 30px;
+            background: rgba(30, 41, 59, 0.8);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            backdrop-filter: blur(10px);
+        }
+
+        .quiz-header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .quiz-header h2 {
+            color: #f43f5e;
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #334155;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: #f43f5e;
+            transition: width 0.3s ease;
+        }
+
+        .question-box {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            color: #f1f5f9;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        .option-btn {
+            background: #334155;
+            color: #fff;
+            border: 2px solid transparent;
+            padding: 14px 20px;
+            border-radius: 12px;
+            font-size: 1rem;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.2s ease;
+        }
+
+        .option-btn:hover {
+            background: #475569;
+            border-color: #38bdf8;
+        }
+
+        .score-box {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .score-box h3 {
+            font-size: 2rem;
+            color: #38bdf8;
+            margin-bottom: 15px;
+        }
+
+        .restart-btn {
+            background: #f43f5e;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 1rem;
+            border-radius: 10px;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: 0.2s;
+        }
+
+        .restart-btn:hover {
+            background: #e11d48;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>🎯 Interactive Magic Playground</h1>
+        <p>Ball ko pakad kar dikhao & Didi special Quiz khelo!</p>
+    </div>
+
+    <!-- 1. Dodge Ball Game Arena -->
+    <div class="game-section">
+        <div class="arena" id="arena">
+            <div class="arena-title">Mouse Cursor ko Ball ke paas laao</div>
+            <div class="dodge-ball" id="ball"></div>
+        </div>
+    </div>
+
+    <!-- 2. Quiz Game Section -->
+    <div class="quiz-section" id="quizBox">
+        <div class="quiz-header">
+            <h2>❓ Didi Special Quiz</h2>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress"></div>
+            </div>
+        </div>
+
+        <div id="quizContent">
+            <div class="question-box" id="questionText">Question yahan aayega...</div>
+            <div class="options-grid" id="optionsContainer"></div>
+        </div>
+
+        <div id="resultBox" class="score-box" style="display: none;">
+            <h3>🎉 Quiz Finish Ho Gaya!</h3>
+            <p id="scoreText" style="font-size: 1.3rem; margin-bottom: 10px;"></p>
+            <p id="feedbackText" style="color: #94a3b8;"></p>
+            <button class="restart-btn" onclick="restartQuiz()">Dobara Khelo</button>
+        </div>
+    </div>
+
+    <script>
+        // --- 1. DODGE BALL LOGIC ---
+        const ball = document.getElementById('ball');
+        const arena = document.getElementById('arena');
+
+        arena.addEventListener('mousemove', (e) => {
+            const rect = arena.getBoundingClientRect();
+            const mouseX = e.clientX - rect.left;
+            const mouseY = e.clientY - rect.top;
+
+            const ballX = ball.offsetLeft + 25;
+            const ballY = ball.offsetTop + 25;
+
+            const distance = Math.hypot(mouseX - ballX, mouseY - ballY);
+
+            // Agar mouse ball ke 80px ke andar aaye toh ball door bhagegi
+            if (distance < 80) {
+                const newX = Math.floor(Math.random() * (arena.clientWidth - 60));
+                const newY = Math.floor(Math.random() * (arena.clientHeight - 60));
+                
+                ball.style.left = `${newX}px`;
+                ball.style.top = `${newY}px`;
+            }
+        });
+
+        // --- 2. QUIZ GAME LOGIC ---
+        const questions = [
+            {
+                q: "1. Ghar me sabse zyada bhoklak (gusse/daatne) waali kaun lagti hai?",
+                options: ["Didi", "Mummy", "Papa", "Koi nahi"],
+                answer: 0
+            },
+            {
+                q: "2. Sabse zyada phone kaun chalata hai?",
+                options: ["Didi", "Main khud", "Bhai", "Mummy"],
+                answer: 0
+            },
+            {
+                q: "3. Jab mummy se daant padti hai toh sabse pehle kaun bachata hai?",
+                options: ["Papa", "Didi", "Bhagwan ji", "Koi nahi"],
+                answer: 1
+            },
+            {
+                q: "4. Ghar me sabse zyada late se kaun so kar uthta hai?",
+                options: ["Didi", "Main", "Bhai", "Sab jaldi uthte hain"],
+                answer: 0
+            },
+            {
+                q: "5. Online shopping ke parcel sabse zyada kiske aate hain?",
+                options: ["Didi ke", "Mummy ke", "Papa ke", "Mere"],
+                answer: 0
+            },
+            {
+                q: "6. Maggi sabse aacchi kaun banata hai?",
+                options: ["Didi", "Mummy", "Main khud", "Zomato wale"],
+                answer: 0
+            },
+            {
+                q: "7. TV ka Remote par sabse zyada kabza kiska rehta hai?",
+                options: ["Didi ka", "Mummy ka", "Papa ka", "Mera"],
+                answer: 0
+            },
+            {
+                q: "8. Sabse zyada reel/video kaun banata hai?",
+                options: ["Didi", "Dost", "Mummy", "Main"],
+                answer: 0
+            },
+            {
+                q: "9. Extra paise mangne ho toh kiske paas jana sabse safe hai?",
+                options: ["Didi ke paas", "Mummy ke paas", "Papa ke paas", "Bank me"],
+                answer: 0
+            },
+            {
+                q: "10. Poore ghar ki sabse pyaari aur best member kaun hai?",
+                options: ["Didi ❤️", "Sabhi log", "Main", "Koi nahi"],
+                answer: 0
+            }
+        ];
+
+        let currentQ = 0;
+        let score = 0;
+
+        function loadQuestion() {
+            const q = questions[currentQ];
+            document.getElementById('questionText').innerText = q.q;
+            
+            const optionsContainer = document.getElementById('optionsContainer');
+            optionsContainer.innerHTML = '';
+
+            // Update Progress Bar
+            const progressPercent = ((currentQ) / questions.length) * 100;
+            document.getElementById('progress').style.width = `${progressPercent}%`;
+
+            q.options.forEach((option, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.innerText = option;
+                btn.onclick = () => selectAnswer(index);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function selectAnswer(index) {
+            if (index === questions[currentQ].answer) {
+                score++;
+            }
+
+            currentQ++;
+
+            if (currentQ < questions.length) {
+                loadQuestion();
+            } else {
+                showResult();
+            }
+        }
+
+        function showResult() {
+            document.getElementById('quizContent').style.display = 'none';
+            document.getElementById('resultBox').style.display = 'block';
+            document.getElementById('progress').style.width = `100%`;
+
+            document.getElementById('scoreText').innerText = `Aapka Score: ${score} / ${questions.length}`;
+            
+            let feedback = "";
+            if (score >= 8) {
+                feedback = "Wah! Aap apni Didi aur family ko bohot aacche se jaante ho! 🎉";
+            } else if (score >= 5) {
+                feedback = "Aaccha score hai! Par thoda aur jaanna baki hai 😄";
+            } else {
+                feedback = "Koi nahi, agli baar aur dhyan se khelna! 👍";
+            }
+            document.getElementById('feedbackText').innerText = feedback;
+        }
+
+        function restartQuiz() {
+            currentQ = 0;
+            score = 0;
+            document.getElementById('quizContent').style.display = 'block';
+            document.getElementById('resultBox').style.display = 'none';
+            loadQuestion();
+        }
+
+        // Quiz Start Karein
+        loadQuestion();
+    </script>
+</body>
+  </html>
+  
